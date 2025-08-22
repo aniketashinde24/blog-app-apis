@@ -42,7 +42,7 @@ public class UserController {
 	
 	//DELETE - delete user
 	@DeleteMapping("/{userId}")
-	public ResponseEntity<?> deleteUser(@PathVariable("userId") Integer uId){
+	public ResponseEntity<ApiResponse> deleteUser(@PathVariable("userId") Integer uId){
 		this.userService.deleteUser(uId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("User Deleted Successfully",true), HttpStatus.OK);
 	}
