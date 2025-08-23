@@ -25,7 +25,6 @@ public class UserServiceImpl implements UserService {
 	public UserDto createUser(UserDto userDto) {
 		User user = this.dtoToUser(userDto);
 		User savedUser = this.userRepo.save(user);
-
 		return this.userToDto(savedUser);
 	}
 
