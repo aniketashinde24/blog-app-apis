@@ -2,6 +2,8 @@ package com.example.blog.services.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.persistence.PostRemove;
 
@@ -13,7 +15,9 @@ import com.example.blog.entities.Category;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
 import com.example.blog.exceptions.ResourceNotFoundException;
+import com.example.blog.payloads.CategoryDto;
 import com.example.blog.payloads.PostDto;
+import com.example.blog.payloads.UserDto;
 import com.example.blog.repositories.CategoryRepo;
 import com.example.blog.repositories.PostRepo;
 import com.example.blog.repositories.UserRepo;
@@ -45,42 +49,90 @@ public class PostServiceImpl implements PostService {
 		post.setAddedDate(new Date());
 		post.setUser(user);
 		post.setCategory(category);
+		Post savedPost = this.postRepo.save(post);
+
+		PostDto dto = this.modelMapper.map(savedPost, PostDto.class);
+		// dto.setUserDto(this.modelMapper.map(user, UserDto.class));
+		// dto.setCategoryDto(this.modelMapper.map(category, CategoryDto.class));
+
+		return dto;
+		// return this.modelMapper.map(save, PostDto.class);
+	}
+
+	@Override
+	public PostDto updatePost(PostDto postDto, Integer postId) {
+		Post post = this.postRepo.findById(postId)
+				.orElseThrow(() -> new ResourceNotFoundException("Post", "Post Id", postId));
+
+		post.setTitle(postDto.getTitle());
+		post.setContent(postDto.getContent());
+		post.setImageName(postDto.getImageName());
+
 		Post save = this.postRepo.save(post);
 		return this.modelMapper.map(save, PostDto.class);
 	}
 
 	@Override
-	public PostDto updatePost(PostDto postDto, Integer postId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void deletePost(Integer postId) {
-		// TODO Auto-generated method stub
+
+		Post post = this.postRepo.findById(postId)
+				.orElseThrow(() -> new ResourceNotFoundException("Post", "Post Id", postId));
+		this.postRepo.delete(post);
 
 	}
 
 	@Override
 	public List<PostDto> getAllPost() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Post> allPosts = this.postRepo.findAll();
+		List<PostDto> collect = allPosts.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
+				.collect(Collectors.toList());
+
+		return collect;
 	}
 
 	@Override
 	public PostDto getSinglePost(Integer postId) {
-		// TODO Auto-generated method stub
-		return null;
+
+		Post post = this.postRepo.findById(postId)
+				.orElseThrow(() -> new ResourceNotFoundException("Post", "Post id", postId));
+		User user = post.getUser();
+		Category category = post.getCategory();
+		PostDto dto = this.modelMapper.map(post, PostDto.class);
+		// dto.setUserDto(this.modelMapper.map(user, UserDto.class));
+		// dto.setCategoryDto(this.modelMapper.map(category, CategoryDto.class));
+		// dto.setUserDto(this.modelMapper.map(user, UserDto.class));
+		// dto.setCategoryDto(this.modelMapper.map(category, CategoryDto.class));
+
+		return dto;
+
+		// return null;
 	}
 
 	@Override
 	public List<PostDto> getAllPostByUser(Integer userId) {
 		// TODO Auto-generated method stub
-		return null;
+		User user = this.userRepo.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "User Id", userId));
+		List<Post> posts = this.postRepo.findByUser(user);
+		List<PostDto> collect = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
+				.collect(Collectors.toList());
+
+		return collect;
 	}
 
 	@Override
 	public List<PostDto> getAllPostByCategory(Integer categoryId) {
+		Category category = this.categoryRepo.findById(categoryId)
+				.orElseThrow(() -> new ResourceNotFoundException("Category", "Category Id", categoryId));
+		List<Post> posts = this.postRepo.findByCategory(category);
+		List<PostDto> collect = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class))
+				.collect(Collectors.toList());
+
+		return collect;
+	}
+
+	@Override
+	public List<PostDto> searchPost(String keyword) {
 		// TODO Auto-generated method stub
 		return null;
 	}
