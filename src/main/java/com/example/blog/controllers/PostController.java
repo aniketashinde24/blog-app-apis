@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.blog.payloads.ApiResponse;
 import com.example.blog.payloads.PostDto;
+import com.example.blog.payloads.PostResponse;
 import com.example.blog.services.PostService;
 
 @RestController
@@ -61,9 +63,11 @@ public class PostController {
 	// get all post
 
 	@GetMapping("/posts")
-	public ResponseEntity<List<PostDto>> getAllPosts() {
-		List<PostDto> allPosts = this.postService.getAllPost();
-		return new ResponseEntity<List<PostDto>>(allPosts, HttpStatus.OK);
+	public ResponseEntity<PostResponse> getAllPosts(
+			@RequestParam(value = "pageNumber", defaultValue = "0", required = false) Integer pageNumber,
+			@RequestParam(value = "pageSize", defaultValue = "2", required = false) Integer pageSize) {
+		PostResponse allPost = this.postService.getAllPost(pageNumber, pageSize);
+		return new ResponseEntity<PostResponse>(allPost, HttpStatus.OK);
 	}
 
 	// delete by id
