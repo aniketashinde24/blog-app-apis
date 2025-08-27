@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.blog.config.AppConstant;
 import com.example.blog.payloads.ApiResponse;
 import com.example.blog.payloads.PostDto;
 import com.example.blog.payloads.PostResponse;
@@ -28,7 +29,6 @@ public class PostController {
 	private PostService postService;
 
 	// create post
-
 	@PostMapping("/user/{userId}/category/{categoryId}/posts")
 	public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto, @PathVariable Integer userId,
 			@PathVariable Integer categoryId) {
@@ -44,8 +44,8 @@ public class PostController {
 
 		return new ResponseEntity<PostDto>(singlePost, HttpStatus.OK);
 	}
-	// get by user
 
+	// get by user
 	@GetMapping("/user/{userId}/post")
 	public ResponseEntity<List<PostDto>> getPostByUser(@PathVariable Integer userId) {
 		List<PostDto> postByUser = this.postService.getAllPostByUser(userId);
@@ -53,7 +53,6 @@ public class PostController {
 	}
 
 	// get by category
-
 	@GetMapping("/category/{categoryId}/post")
 	public ResponseEntity<List<PostDto>> getPostByCategory(@PathVariable Integer categoryId) {
 		List<PostDto> postByCatgory = this.postService.getAllPostByCategory(categoryId);
@@ -61,13 +60,12 @@ public class PostController {
 	}
 
 	// get all post
-
 	@GetMapping("/posts")
 	public ResponseEntity<PostResponse> getAllPosts(
-			@RequestParam(value = "pageNumber", defaultValue = "0", required = false) Integer pageNumber,
-			@RequestParam(value = "pageSize", defaultValue = "2", required = false) Integer pageSize,
-			@RequestParam(value = "sortBy", defaultValue = "postId", required = false) String sortBy,
-			@RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir) {
+			@RequestParam(value = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER, required = false) Integer pageNumber,
+			@RequestParam(value = "pageSize", defaultValue = AppConstant.PAGE_SIZE, required = false) Integer pageSize,
+			@RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_BY, required = false) String sortBy,
+			@RequestParam(value = "sortDir", defaultValue = AppConstant.SORT_DIR, required = false) String sortDir) {
 		PostResponse allPost = this.postService.getAllPost(pageNumber, pageSize, sortBy, sortDir);
 		return new ResponseEntity<PostResponse>(allPost, HttpStatus.OK);
 	}
@@ -81,12 +79,21 @@ public class PostController {
 	}
 
 	// update post
-
 	@PutMapping("/posts/{postId}")
 	public ResponseEntity<PostDto> updatePoEntity(@RequestBody PostDto postDto, @PathVariable Integer postId) {
 
 		PostDto updatePost = this.postService.updatePost(postDto, postId);
 
 		return new ResponseEntity<PostDto>(updatePost, HttpStatus.OK);
+	}
+
+	// search
+	@GetMapping("/posts/search/{keyword}")
+	public ResponseEntity<List<PostDto>> searchPostByTitle(@PathVariable String keyword) {
+
+		List<PostDto> post = this.postService.searchPost(keyword);
+
+		return new ResponseEntity<List<PostDto>>(post, HttpStatus.OK);
+
 	}
 }
