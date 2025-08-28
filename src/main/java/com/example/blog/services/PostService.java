@@ -35,4 +35,6 @@ public interface PostService {
 	//search post
 	List<PostDto> searchPost(String keyword);
 
+	//PostDto getPostById(Integer postId);
+
 }

@@ -1,8 +1,10 @@
 package com.example.blog.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.blog.config.AppConstant;
 import com.example.blog.payloads.ApiResponse;
 import com.example.blog.payloads.PostDto;
 import com.example.blog.payloads.PostResponse;
+import com.example.blog.services.FileService;
 import com.example.blog.services.PostService;
 
 @RestController
@@ -27,6 +31,12 @@ public class PostController {
 
 	@Autowired
 	private PostService postService;
+
+	@Autowired
+	private FileService fileService;
+
+	@Value("${project.image}")
+	private String path;
 
 	// create post
 	@PostMapping("/user/{userId}/category/{categoryId}/posts")
@@ -96,4 +106,17 @@ public class PostController {
 		return new ResponseEntity<List<PostDto>>(post, HttpStatus.OK);
 
 	}
+
+	// upload image
+	@PostMapping("/post/image/upload/{postId}")
+	public ResponseEntity<PostDto> uploadPostImage(@RequestParam("image") MultipartFile image,
+			@PathVariable("postId") Integer postId) throws IOException {
+		PostDto postDto = this.postService.getSinglePost(postId); 
+		String fileName = this.fileService.uploadImage(path, image);
+
+		postDto.setImageName(fileName);
+		PostDto updatePost = this.postService.updatePost(postDto, postId);
+		return new ResponseEntity<PostDto>(updatePost, HttpStatus.OK);
+	}
+
 }
