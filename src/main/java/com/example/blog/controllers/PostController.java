@@ -1,11 +1,17 @@
 package com.example.blog.controllers;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.hibernate.engine.jdbc.StreamUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -111,12 +117,19 @@ public class PostController {
 	@PostMapping("/post/image/upload/{postId}")
 	public ResponseEntity<PostDto> uploadPostImage(@RequestParam("image") MultipartFile image,
 			@PathVariable("postId") Integer postId) throws IOException {
-		PostDto postDto = this.postService.getSinglePost(postId); 
+		PostDto postDto = this.postService.getSinglePost(postId);
 		String fileName = this.fileService.uploadImage(path, image);
 
 		postDto.setImageName(fileName);
 		PostDto updatePost = this.postService.updatePost(postDto, postId);
 		return new ResponseEntity<PostDto>(updatePost, HttpStatus.OK);
+	}
+		@GetMapping("/post/image/{imageName}")
+	public void downloadImage(@PathVariable("imageName") String imageName, HttpServletResponse response) throws IOException {
+		InputStream resource = this.fileService.getResource(path, imageName);
+		response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+		StreamUtils.copy(resource, response.getOutputStream());
+
 	}
 
 }
