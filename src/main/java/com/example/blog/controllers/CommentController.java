@@ -33,7 +33,7 @@ public class CommentController {
 
 		this.commentService.deleteComment(commentId);
 
-		return new ResponseEntity<ApiResponse>(new ApiResponse("comment deleted Successfully", true), HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Comment deleted Successfully", true), HttpStatus.OK);
 	}
 
 }
