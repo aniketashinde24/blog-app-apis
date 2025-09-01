@@ -91,7 +91,7 @@ public class PostController {
 	public ResponseEntity<ApiResponse> deletePostById(@PathVariable Integer postId) {
 		this.postService.deletePost(postId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Post Deleted Successfully", true),
-				HttpStatus.BAD_REQUEST);
+				HttpStatus.OK);
 	}
 
 	// update post
